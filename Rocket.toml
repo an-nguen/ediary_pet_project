@@ -1,0 +1,6 @@
+[global.databases]
+main_db = {url = "postgres://admin:admin@localhost/ediary_db"}
+
+[global.app]
+token_secret_key = "N1/20?rHF3}I||Qc=!le[Whl(Pwvz5"
+hash_secret_key = "M~3L*[lxi.^-/Q:w=Sgu@cxOXa))p#"
