@@ -1,10 +1,10 @@
 # school e-diary application (pet project)
-****
+
 **Backend** - REST API server written in Rust using **Rocket** framework + **Diesel** ORM.  
 **Frontend** - ?
-****
+
 # Structure
-****
+
 
     .
     ├── Cargo.lock
@@ -41,23 +41,22 @@
         └── token.rs                          // access token 'guard' 
 
 
-****
+
 # Build and run
-****
+
 1. Clone a repository
 
-
-    git clone http://github.com/an-nguen/ediary-app
-
+````   
+git clone http://github.com/an-nguen/ediary-app
+````
 
 2. Go to directory
-
-    
-    cd ./ediary-app
-
+````
+cd ./ediary-app
+````
 3. Build and run app
-
-
-    cargo check
-    cargo build --release
-    cargo run
+````
+cargo check
+cargo build --release
+cargo run
+````
