@@ -1,46 +1,42 @@
-use rocket::serde::json::Json;
-
 use crate::models::errors::ApiError;
-use crate::models::student::{NewStudent, Student, UpdStudent};
+use crate::models::subject::{Subject, UpdSubject};
 use crate::models::DeletedCount;
-use crate::repository::student;
+use crate::repository::subject;
 use crate::routes::RouteResult;
 use crate::token::Token;
 use crate::MainDb;
+use rocket::serde::json::Json;
 
 #[get("/")]
-pub async fn find_all(conn: MainDb) -> RouteResult<Vec<Student>> {
-    conn.run(|c| match crate::repository::student::find_all(&c) {
+pub async fn find_all(conn: MainDb) -> RouteResult<Vec<Subject>> {
+    conn.run(|c| match crate::repository::subject::find_all(&c) {
         Ok(res) => Ok(Json(res)),
         Err(e) => Err(e),
     })
     .await
 }
 
-#[post("/", data = "<student>")]
-pub async fn create(
-    db: MainDb,
-    token: Token<'_>,
-    student: Json<NewStudent>,
-) -> RouteResult<Student> {
+#[post("/", data = "<subject>")]
+pub async fn create(db: MainDb, token: Token<'_>, subject: Json<Subject>) -> RouteResult<Subject> {
     user_has_role!(token, "ADMIN");
-    db.run(|c| match student::create(c, student.into_inner()) {
+    db.run(|c| match subject::create(c, subject.into_inner()) {
         Ok(res) => Ok(Json(res)),
         Err(err) => Err(err),
     })
     .await
 }
 
-#[put("/<id>", data = "<student>")]
+#[put("/<id>", data = "<subject>")]
 pub async fn update(
     db: MainDb,
     token: Token<'_>,
     id: i32,
-    student: Json<UpdStudent>,
-) -> RouteResult<Student> {
+    subject: Json<UpdSubject>,
+) -> RouteResult<Subject> {
     user_has_role!(token, "ADMIN");
+
     db.run(
-        move |c| match student::update(c, id, student.into_inner()) {
+        move |c| match subject::update(c, id, subject.into_inner()) {
             Ok(res) => Ok(Json(res)),
             Err(e) => Err(e),
         },
@@ -51,7 +47,8 @@ pub async fn update(
 #[delete("/<id>")]
 pub async fn delete(db: MainDb, token: Token<'_>, id: i32) -> RouteResult<DeletedCount> {
     user_has_role!(token, "ADMIN");
-    db.run(move |c| match student::delete(c, id) {
+
+    db.run(move |c| match subject::delete(c, id) {
         Ok(dc) => Ok(Json(dc)),
         Err(e) => Err(e),
     })

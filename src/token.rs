@@ -1,48 +1,81 @@
-use crate::AppConfig;
-use chrono::Duration;
+use std::fmt::Debug;
+
 use hmac::{Hmac, NewMac};
-use jwt::{Claims, RegisteredClaims, SignWithKey, VerifyWithKey};
-use rocket::http::hyper::header::AUTHORIZATION;
+use jwt::{Claims, Error, RegisteredClaims, SignWithKey, VerifyWithKey};
+use r2d2::PooledConnection;
 use rocket::http::Status;
 use rocket::request::{FromRequest, Outcome};
 use rocket::Request;
 use sha2::Sha256;
-use std::fmt::Debug;
 
-#[derive(Clone)]
+use crate::models::errors::AuthError;
+use crate::models::role::Role;
+use crate::repository::role::get_roles_by_username;
+use crate::{AppConfig, MainDb};
+use redis::Commands;
+use rocket::http::hyper::header::AUTHORIZATION;
+
 pub struct TokenService {
-    pub secret_key: String,
+    pub config: AppConfig,
+    pub redis_conn: PooledConnection<redis::Client>,
 }
 
 impl TokenService {
-    pub fn signing(&self, sub: &str) -> String {
-        let key: Hmac<Sha256> =
-            Hmac::new_from_slice(self.secret_key.as_bytes()).expect("failed to parse secret_key");
+    const BEARER: &'static str = "Bearer";
+
+    pub fn signing(&self, sub: &str, exp: u64) -> Result<String, Error> {
+        let key: Hmac<Sha256> = Hmac::new_from_slice(self.config.token_secret_key.as_bytes())
+            .expect("failed to parse secret_key");
         let mut claims: Claims = Claims::new(RegisteredClaims::default());
-        claims.registered.issuer = Some("".to_string()); // .insert("ediary_api".to_string());
+        claims.registered.issuer = Some("ediary_api".to_string()); // .insert("ediary_api".to_string());
 
         claims.registered.issued_at = Some(chrono::Utc::now().timestamp() as u64);
 
         claims.registered.subject = Some(String::from(sub));
 
-        let hour = chrono::Utc::now() + Duration::hours(1);
-        claims.registered.expiration = Some(hour.timestamp() as u64);
-        claims.sign_with_key(&key).expect("failed to signing")
+        claims.registered.expiration = Some(exp);
+        claims.sign_with_key(&key)
     }
 
-    pub fn verify(&self, token: &str) -> bool {
-        let key: Hmac<Sha256> =
-            Hmac::new_from_slice(self.secret_key.as_bytes()).expect("failed to parse secret_key");
-        let claims: Claims = token
-            .verify_with_key(&key)
-            .expect("failed to verify claims");
+    pub fn claims(&self, token: &str) -> Result<Claims, Error> {
+        let key: Hmac<Sha256> = Hmac::new_from_slice(self.config.token_secret_key.as_bytes())
+            .expect("failed to parse secret_key");
+        match token.verify_with_key(&key) {
+            Ok(claims) => Ok(claims),
+            Err(_) => Err(Error::InvalidSignature),
+        }
+    }
+
+    pub fn verify(&mut self, token: &str) -> bool {
+        if !token.starts_with(TokenService::BEARER) {
+            return false;
+        }
+        let token: String = String::from(&token[TokenService::BEARER.len() + 1..]);
+
+        let claims = match self.claims(token.clone().as_str()) {
+            Ok(claims) => claims,
+            Err(e) => {
+                println!("{:?}", e);
+                return false;
+            }
+        };
+        let token_blacklist: Vec<String> =
+            self.redis_conn.lrange("token_blacklist", 0, -1).unwrap();
+        if token_blacklist.iter().any(|t| t == &token) {
+            return false;
+        }
+
         let issuer_is_valid = match claims.registered.issuer {
             Some(value) => value == "ediary_api",
             None => false,
         };
         let is_not_expired = match claims.registered.expiration {
-            Some(value) => chrono::Utc::now().timestamp() as u64 > value,
-            None => false,
+            Some(value) => value > chrono::Utc::now().timestamp() as u64,
+            None => {
+                self.redis_conn
+                    .rpush::<&str, String, i32>("token_blacklist", token);
+                false
+            }
         };
 
         issuer_is_valid && is_not_expired
@@ -58,40 +91,80 @@ impl<'r> FromRequest<'r> for TokenService {
             .rocket()
             .state::<AppConfig>()
             .expect("token service is not defined");
+        let pool = request
+            .rocket()
+            .state::<r2d2::Pool<redis::Client>>()
+            .unwrap();
+        let conn = pool.get().unwrap();
 
         Outcome::Success(TokenService {
-            secret_key: app_config.token_secret_key.clone(),
+            config: app_config.clone(),
+            redis_conn: conn,
         })
     }
 }
 
-pub struct Token<'r>(&'r str);
-
 #[derive(Debug)]
-pub enum ApiKeyError {
-    Missing,
-    Invalid,
+pub struct Token<'r> {
+    pub token: &'r str,
+    pub roles: Vec<Role>,
+}
+
+impl<'r> Token<'r> {
+    pub fn has_role(&self, name: &str) -> bool {
+        self.roles.iter().any(|r| r.name == name)
+    }
 }
 
 #[rocket::async_trait]
 impl<'r> FromRequest<'r> for Token<'r> {
-    type Error = ApiKeyError;
+    type Error = AuthError;
 
     async fn from_request(request: &'r Request<'_>) -> Outcome<Self, Self::Error> {
         let app_config = request
             .rocket()
             .state::<AppConfig>()
-            .expect("token service is not defined");
-        let token_service = TokenService {
-            secret_key: app_config.token_secret_key.clone(),
+            .expect("AppConfig is not defined");
+        let pool = request
+            .rocket()
+            .state::<r2d2::Pool<redis::Client>>()
+            .unwrap();
+        let pg_conn = request.guard::<MainDb>().await.unwrap();
+        let conn = pool.get().unwrap();
+
+        let mut token_service = TokenService {
+            config: app_config.clone(),
+            redis_conn: conn,
         };
 
         match request.headers().get_one(AUTHORIZATION.as_str()) {
             Some(header_value) if token_service.verify(header_value) => {
-                Outcome::Success(Token(header_value))
+                let token_str = &header_value[TokenService::BEARER.len() + 1..];
+                let claims = token_service.claims(token_str).unwrap();
+                return if let Some(username) = claims.registered.subject {
+                    if app_config.admin.as_ref().unwrap() == &username {
+                        return Outcome::Success(Token {
+                            token: token_str,
+                            roles: vec![Role {
+                                id: -1,
+                                name: "ADMIN".to_string(),
+                                description: None,
+                            }],
+                        });
+                    }
+                    let roles: Vec<Role> = pg_conn
+                        .run(move |c| get_roles_by_username(c, &username))
+                        .await;
+                    Outcome::Success(Token {
+                        token: &header_value[TokenService::BEARER.len() + 1..],
+                        roles,
+                    })
+                } else {
+                    Outcome::Failure((Status::Unauthorized, AuthError::InvalidToken))
+                };
             }
-            None => Outcome::Failure((Status::Unauthorized, ApiKeyError::Missing)),
-            _ => Outcome::Failure((Status::Unauthorized, ApiKeyError::Invalid)),
+            None => Outcome::Failure((Status::Unauthorized, AuthError::MissingAuthHeader)),
+            _ => Outcome::Failure((Status::Unauthorized, AuthError::InvalidToken)),
         }
     }
 }

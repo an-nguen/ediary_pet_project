@@ -1,21 +1,26 @@
-use diesel::result::Error;
+use chrono::{Duration, Utc};
 use diesel::{ExpressionMethods, PgConnection, QueryDsl, RunQueryDsl};
 use rand::distributions::Alphanumeric;
 use rand::{thread_rng, Rng};
 
-use crate::models::error::MyError;
+use crate::models::errors::{ApiError, AuthError};
 use crate::models::token_request::TokenRequest;
 use crate::models::token_response::TokenResponse;
 use crate::models::user::{NewUser, ReqNewUser, ReqUpdUser, UpdUser, UserRead};
+use crate::models::DeletedCount;
 use crate::password_hash::PasswordHashService;
 use crate::token::TokenService;
 
-pub fn find_all(connection: &PgConnection) -> Result<Vec<UserRead>, Error> {
+pub fn find_all(connection: &PgConnection) -> Result<Vec<UserRead>, ApiError> {
     use crate::schema::usr;
 
-    usr::table
+    match usr::table
         .select((usr::username, usr::email, usr::birthday, usr::active))
         .load::<UserRead>(connection)
+    {
+        Ok(res) => Ok(res),
+        Err(e) => Err(ApiError::internal_server_error(Some(format!("{}", e)))),
+    }
 }
 
 pub fn authenticate(
@@ -23,28 +28,64 @@ pub fn authenticate(
     token_service: &TokenService,
     password_hash_service: &PasswordHashService,
     token_req: TokenRequest,
-) -> Result<TokenResponse, MyError> {
+) -> Result<TokenResponse, AuthError> {
     use crate::schema::usr::dsl::*;
 
-    let result: (String, String) = match usr
+    if let Some(admin) = token_service.config.admin.clone() {
+        if let Some(password) = token_service.config.password.clone() {
+            if token_req.username == admin && token_req.password == password {
+                let access_token = generate_token!(
+                    token_service,
+                    token_req.username.as_str(),
+                    (Utc::now() + Duration::hours(1)).timestamp() as u64
+                );
+                let refresh_token = generate_token!(
+                    token_service,
+                    token_req.username.as_str(),
+                    (Utc::now() + Duration::days(1)).timestamp() as u64
+                );
+                return Ok(TokenResponse {
+                    access_token,
+                    refresh_token,
+                });
+            }
+        }
+    }
+
+    let result: (String, bool) = match usr
         .filter(username.eq(token_req.username.clone()))
-        .select((password_hash, password_salt))
+        .select((password_hash, active))
         .first(connection)
     {
         Ok(res) => res,
-        Err(e) => return Err(MyError::new(format!("{}", e).as_str())),
+        Err(_) => return Err(AuthError::InvalidUsername),
     };
 
-    if password_hash_service.verify_password(
-        token_req.password.as_str(),
-        result.1.as_str(),
-        result.0.as_str(),
-    ) {
+    if !result.1 {
+        return Err(AuthError::NotActive);
+    }
+
+    if password_hash_service.verify_password(token_req.password.as_str(), result.0.as_str()) {
+        let access_token = match token_service.signing(
+            token_req.username.as_str(),
+            (Utc::now() + Duration::hours(1)).timestamp() as u64,
+        ) {
+            Ok(t) => t,
+            Err(e) => return Err(AuthError::Other(String::from(e.to_string()))),
+        };
+        let refresh_token = match token_service.signing(
+            token_req.username.as_str(),
+            (Utc::now() + Duration::days(1)).timestamp() as u64,
+        ) {
+            Ok(t) => t,
+            Err(e) => return Err(AuthError::Other(String::from(e.to_string()))),
+        };
         Ok(TokenResponse {
-            access_token: token_service.signing(token_req.username.as_str()),
+            access_token,
+            refresh_token,
         })
     } else {
-        Err(MyError::new("password is not valid"))
+        Err(AuthError::InvalidPassword)
     }
 }
 
@@ -52,7 +93,8 @@ pub fn create(
     connection: &PgConnection,
     password_hash_service: &PasswordHashService,
     obj: ReqNewUser,
-) -> Result<UserRead, Error> {
+    active: bool,
+) -> Result<UserRead, ApiError> {
     use crate::schema::usr;
 
     let salt = PasswordHashService::generate_salt();
@@ -69,13 +111,18 @@ pub fn create(
         password_salt: &salt,
         email: &obj.email,
         birthday: obj.birthday,
-        activation_token: &activation_token,
+        active,
+        activation_token: if active { &activation_token } else { "" },
     };
 
-    diesel::insert_into(usr::table)
+    match diesel::insert_into(usr::table)
         .values(&user)
         .returning((usr::username, usr::email, usr::birthday, usr::active))
         .get_result::<UserRead>(connection)
+    {
+        Ok(res) => Ok(res),
+        Err(err) => Err(ApiError::internal_server_error(Some(err.to_string()))),
+    }
 }
 
 pub fn update(
@@ -83,22 +130,22 @@ pub fn update(
     password_hash_service: &PasswordHashService,
     user_id: i32,
     obj: ReqUpdUser,
-) -> Result<UserRead, MyError> {
+) -> Result<UserRead, ApiError> {
     use crate::schema::usr::dsl::*;
 
-    let result: (String, String) = match usr
+    let result: String = match usr
         .filter(id.eq(user_id))
-        .select((password_hash, password_salt))
+        .select(password_hash)
         .first(connection)
     {
         Ok(res) => res,
-        Err(e) => return Err(MyError::new(&format!("{}", e))),
+        Err(e) => return Err(ApiError::internal_server_error(Some(format!("{}", e)))),
     };
 
-    if password_hash_service.verify_password(obj.old_password, result.1.as_str(), result.0.as_str())
-    {
+    if password_hash_service.verify_password(obj.old_password.as_str(), &result) {
         let new_salt = PasswordHashService::generate_salt();
-        let new_hash = password_hash_service.hash_password(obj.new_password, new_salt.as_str());
+        let new_hash =
+            password_hash_service.hash_password(obj.new_password.as_str(), new_salt.as_str());
         let user = UpdUser {
             password_hash: new_hash.as_str(),
             password_salt: new_salt.as_str(),
@@ -111,9 +158,18 @@ pub fn update(
             .get_result::<UserRead>(connection)
         {
             Ok(res) => Ok(res),
-            Err(e) => Err(MyError::new(&format!("{}", e))),
+            Err(e) => Err(ApiError::internal_server_error(Some(e.to_string()))),
         }
     } else {
-        Err(MyError::new("old password is invalid"))
+        Err(ApiError::bad_request(Some("bad password".to_string())))
+    }
+}
+
+pub fn delete(conn: &PgConnection, _id: i32) -> Result<DeletedCount, ApiError> {
+    use crate::schema::usr::dsl::*;
+
+    match diesel::delete(usr.find(_id)).execute(conn) {
+        Ok(count) => Ok(DeletedCount { count }),
+        Err(e) => Err(ApiError::internal_server_error(Some(e.to_string()))),
     }
 }

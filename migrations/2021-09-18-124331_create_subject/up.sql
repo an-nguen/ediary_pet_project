@@ -1,5 +1,6 @@
 -- Your SQL goes here
 create table subject (
-    name varchar(256) primary key,
+    id serial primary key,
+    name varchar(256) not null unique,
     description varchar(4096)
 );

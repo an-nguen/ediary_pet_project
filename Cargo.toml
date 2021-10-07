@@ -6,7 +6,7 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-rocket = { version = "0.5.0-rc.1", features = ["json"] }
+rocket = { version = "0.5.0-rc.1", features = ["json", "tls"] }
 diesel = { version = "1.4", default-features = false, features = ["postgres", "chrono", "r2d2"] }
 dotenv = "0.15.0"
 serde = "1.0"
@@ -19,6 +19,9 @@ hmac = "0.11"
 sha2 = "0.9.8"
 rust-argon2 = "0.8"
 rand = "0.8.4"
+redis = {version = "0.21", features = ['r2d2'] }
+r2d2 = "0.8"
+lettre = "0.10.0-rc.3"
 
 [dependencies.rocket_sync_db_pools]
 version = "0.1.0-rc.1"

@@ -6,6 +6,6 @@ create table mark (
     title varchar(512),
     created_at date not null,
     updated_at date not null,
-    mark varchar(32),
+    _mark varchar(32),
     author varchar(512) not null
 )

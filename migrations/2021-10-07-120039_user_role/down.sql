@@ -1,2 +1,2 @@
 -- This file should undo anything in `up.sql`
-drop table mark;
+drop table user_role;

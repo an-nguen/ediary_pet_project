@@ -4,5 +4,5 @@ create table stage (
     start_date date not null,
     end_date date not null,
     student_id integer references student (id),
-    stage varchar(32) not null
+    _stage varchar(32) not null
 )
