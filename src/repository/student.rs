@@ -1,54 +1,61 @@
-use crate::models::errors::ApiError;
+use crate::errors::api_error::ApiError;
+use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl};
+
 use crate::models::student::{NewStudent, Student, UpdStudent};
 use crate::models::DeletedCount;
-use diesel::{ExpressionMethods, PgConnection, QueryDsl, RunQueryDsl};
+use crate::repository::common::{PgPool, Repository, RepositoryResult};
+use crate::schema::student;
 
-pub fn find_all(connection: &PgConnection) -> Result<Vec<Student>, ApiError> {
-    use crate::schema::student;
+use ediary_proc_macros::gen_repo_impl;
 
-    find_all!(student::table, Student, connection)
-}
+#[derive(Clone)]
+#[gen_repo_impl]
+pub struct StudentRepository(pub PgPool);
 
-pub fn create(connection: &PgConnection, obj: NewStudent) -> Result<Student, ApiError> {
-    use crate::schema::student;
+impl Repository<i32, Student, NewStudent, UpdStudent> for StudentRepository {
+    fn find_all(&self) -> RepositoryResult<Vec<Student>> {
+        let conn = self.get_conn();
 
-    if obj.first_name.is_none() || obj.last_name.is_none() {
-        return Err(ApiError::bad_request(Option::from(
-            "first name or last name cannot be empty".to_string(),
-        )));
+        find_all!(student::table, Student, &conn)
     }
 
-    if obj.first_name.clone().unwrap().is_empty() || obj.last_name.clone().unwrap().is_empty() {
-        return Err(ApiError::bad_request(Option::from(
-            "first name or last name cannot be empty".to_string(),
-        )));
+    fn get_one(&self, _id: i32) -> RepositoryResult<Student> {
+        let conn = self.get_conn();
+        get_one!(Student, student::table, student::id.eq(_id), &conn)
     }
 
-    create!(student, connection, obj)
-}
+    fn create(&self, obj: NewStudent) -> RepositoryResult<Student> {
+        let conn = self.get_conn();
 
-pub fn update(connection: &PgConnection, _id: i32, obj: UpdStudent) -> Result<Student, ApiError> {
-    use crate::schema::student::dsl::*;
+        if obj.first_name.is_none() || obj.last_name.is_none() {
+            return Err(ApiError::bad_request(Option::from(
+                "first name or last name cannot be empty".to_string(),
+            )));
+        }
 
-    string_null_check!(obj.first_name);
-    string_null_check!(obj.last_name);
+        if obj.first_name.clone().unwrap().is_empty() || obj.last_name.clone().unwrap().is_empty() {
+            return Err(ApiError::bad_request(Option::from(
+                "first name or last name cannot be empty".to_string(),
+            )));
+        }
 
-    match diesel::update(student.filter(id.eq(_id)))
-        .set(&obj)
-        .get_result(connection)
-    {
-        Ok(res) => Ok(res),
-        Err(err) => Err(ApiError::internal_server_error(Option::from(
-            err.to_string(),
-        ))),
+        create!(student, &conn, obj)
     }
-}
 
-pub fn delete(connection: &PgConnection, _id: i32) -> Result<DeletedCount, ApiError> {
-    use crate::schema::student::dsl::*;
+    fn update(&self, _id: i32, obj: UpdStudent) -> RepositoryResult<Student> {
+        use crate::schema::student::dsl::*;
+        let conn = self.get_conn();
 
-    match diesel::delete(student.filter(id.eq(_id))).execute(connection) {
-        Ok(res) => Ok(DeletedCount { count: res }),
-        Err(err) => Err(ApiError::internal_server_error(Some(err.to_string()))),
+        string_null_check!(obj.first_name);
+        string_null_check!(obj.last_name);
+
+        update!(student.filter(id.eq(_id)), &conn, obj)
+    }
+
+    fn delete(&self, _id: i32) -> RepositoryResult<DeletedCount> {
+        use crate::schema::student::dsl::*;
+        let conn = self.get_conn();
+
+        delete!(student.filter(id.eq(_id)), &conn)
     }
 }

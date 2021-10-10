@@ -12,7 +12,7 @@ pub struct Mark {
     pub created_at: NaiveDate,
     pub updated_at: NaiveDate,
     pub _mark: String,
-    pub author: Option<String>
+    pub author: Option<String>,
 }
 
 #[derive(Debug, Insertable, Deserialize)]
@@ -21,5 +21,5 @@ pub struct NewMark {
     pub student_id: i32,
     pub subject_id: i32,
     pub title: Option<String>,
-    pub _mark: String
+    pub _mark: String,
 }

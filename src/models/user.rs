@@ -7,7 +7,6 @@ pub struct User {
     pub id: i32,
     pub username: String,
     pub password_hash: String,
-    pub password_salt: String,
     pub email: String,
     pub birthday: NaiveDate,
     pub active: bool,
@@ -16,6 +15,7 @@ pub struct User {
 
 #[derive(Debug, Queryable, Serialize)]
 pub struct UserRead {
+    pub id: i32,
     pub username: String,
     pub email: String,
     pub birthday: NaiveDate,
@@ -35,7 +35,6 @@ pub struct ReqNewUser {
 pub struct NewUser<'r> {
     pub username: &'r str,
     pub password_hash: &'r str,
-    pub password_salt: &'r str,
     pub email: &'r str,
     pub birthday: NaiveDate,
     pub active: bool,
@@ -54,7 +53,6 @@ pub struct ReqUpdUser {
 #[table_name = "usr"]
 pub struct UpdUser<'r> {
     pub password_hash: &'r str,
-    pub password_salt: &'r str,
     pub email: Option<String>,
     pub birthday: Option<NaiveDate>,
 }

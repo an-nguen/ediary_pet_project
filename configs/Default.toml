@@ -1,0 +1,11 @@
+[server]
+url = "127.0.0.1"
+port = "8000"
+secret_key = "N1/20?rHF3}I||Qc=!le[Whl(Pwvz5"
+resource_path = "/api/v1"
+
+[database]
+redis_uri = "redis://localhost:6379"
+pg_uri = "postgres://admin:admin@localhost/ediary_db"
+
+

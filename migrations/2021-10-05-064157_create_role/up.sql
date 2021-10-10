@@ -6,3 +6,4 @@ create table role (
 );
 
 insert into role (name, description) values ('ADMIN', '');
+insert into role (name, description) values ('USER', '');

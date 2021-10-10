@@ -1,0 +1,234 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="CMakeSettings">
+    <configurations>
+      <configuration PROFILE_NAME="Debug" ENABLED="true" CONFIG_NAME="Debug" />
+    </configurations>
+  </component>
+  <component name="CargoProjects">
+    <cargoProject FILE="$PROJECT_DIR$/Cargo.toml" />
+    <cargoProject FILE="$PROJECT_DIR$/ediary_proc_macros/Cargo.toml" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="b1bbc1f3-45f2-45ea-9240-b06206e1081f" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.env" beforeDir="false" afterPath="$PROJECT_DIR$/.env" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/rs_ediary_api.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/rs_ediary_api.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Cargo.lock" beforeDir="false" afterPath="$PROJECT_DIR$/Cargo.lock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Cargo.toml" beforeDir="false" afterPath="$PROJECT_DIR$/Cargo.toml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Rocket.toml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/migrations/2021-09-18-124530_create_stage/up.sql" beforeDir="false" afterPath="$PROJECT_DIR$/migrations/2021-09-18-124530_create_stage/up.sql" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/migrations/2021-10-03-144408_create_user/up.sql" beforeDir="false" afterPath="$PROJECT_DIR$/migrations/2021-10-03-144408_create_user/up.sql" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/migrations/2021-10-05-064157_create_role/up.sql" beforeDir="false" afterPath="$PROJECT_DIR$/migrations/2021-10-05-064157_create_role/up.sql" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/config.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/config.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/main.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/models/errors.rs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/models/mark.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/mark.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/models/mod.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/mod.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/models/stage.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/stage.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/models/token_request.rs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/models/token_response.rs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/models/user.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/user.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/password_hash.rs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/repository/common.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/repository/common.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/repository/mod.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/repository/mod.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/repository/role.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/repository/role.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/repository/student.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/repository/student.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/repository/subject.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/repository/subject.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/repository/user.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/repository/user.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/rocket_redis.rs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/routes/macros.rs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/routes/mod.rs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/routes/student.rs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/routes/subject.rs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/routes/user.rs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/schema.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/schema.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/tests/mod.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/tests/mod.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/token.rs" beforeDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ClangdSettings">
+    <option name="formatViaClangd" value="false" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Rust File" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="GitSEFilterConfiguration">
+    <file-type-list>
+      <filtered-out-file-type name="LOCAL_BRANCH" />
+      <filtered-out-file-type name="REMOTE_BRANCH" />
+      <filtered-out-file-type name="TAG" />
+      <filtered-out-file-type name="COMMIT_BY_MESSAGE" />
+    </file-type-list>
+  </component>
+  <component name="MacroExpansionManager">
+    <option name="directoryName" value="gjgpwr96" />
+  </component>
+  <component name="ProjectId" id="1yBuQtfFy58iedi2z1PpQ6J2BA4" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true">
+    <ConfirmationsSetting value="2" id="Add" />
+  </component>
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="ASKED_ADD_EXTERNAL_FILES" value="true" />
+    <property name="ASKED_SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
+    <property name="DatabaseDriversLRU" value="postgresql" />
+    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="RunOnceActivity.cidr.known.project.marker" value="true" />
+    <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="cf.first.check.clang-format" value="false" />
+    <property name="cidr.known.project.marker" value="true" />
+    <property name="javascript.nodejs.core.library.configured.version" value="16.11.0" />
+    <property name="javascript.nodejs.core.library.typings.version" value="16.10.3" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/ediary_proc_macros" />
+    <property name="node.js.detected.package.eslint" value="true" />
+    <property name="node.js.detected.package.tslint" value="true" />
+    <property name="node.js.selected.package.eslint" value="(autodetect)" />
+    <property name="node.js.selected.package.tslint" value="(autodetect)" />
+    <property name="nodejs_package_manager_path" value="npm" />
+    <property name="org.rust.cargo.project.model.PROJECT_DISCOVERY" value="true" />
+    <property name="settings.editor.selected.configurable" value="project.propVCSSupport.Mappings" />
+    <property name="ts.external.directory.path" value="$APPLICATION_HOME_DIR$/plugins/JavaScriptLanguage/jsLanguageServicesImpl/external" />
+    <property name="vue.rearranger.settings.migration" value="true" />
+  </component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/ediary_proc_macros" />
+      <recent name="$PROJECT_DIR$/configs" />
+      <recent name="$PROJECT_DIR$/tls" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/src/dto" />
+      <recent name="$PROJECT_DIR$/configs" />
+      <recent name="$PROJECT_DIR$/src/errors" />
+      <recent name="$PROJECT_DIR$/src/middlewares" />
+      <recent name="$PROJECT_DIR$/src" />
+    </key>
+  </component>
+  <component name="RunManager">
+    <configuration default="true" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="Run" type="CargoCommandRunConfiguration" factoryName="Cargo Command">
+      <option name="command" value="run --package rs_ediary_api --bin rs_ediary_api" />
+      <option name="workingDirectory" value="file://$PROJECT_DIR$" />
+      <option name="channel" value="DEFAULT" />
+      <option name="requiredFeatures" value="true" />
+      <option name="allFeatures" value="false" />
+      <option name="emulateTerminal" value="false" />
+      <option name="withSudo" value="false" />
+      <option name="backtrace" value="SHORT" />
+      <envs>
+        <env name="APP_ADMIN_USERNAME" value="admin" />
+        <env name="APP_ADMIN_PASSWORD" value="admin" />
+      </envs>
+      <option name="isRedirectInput" value="false" />
+      <option name="redirectInputPath" value="" />
+      <method v="2">
+        <option name="CARGO.BUILD_TASK_PROVIDER" enabled="true" />
+      </method>
+    </configuration>
+  </component>
+  <component name="RustProjectSettings">
+    <option name="runRustfmtOnSave" value="true" />
+    <option name="toolchainHomeDirectory" value="/usr/bin" />
+    <option name="useRustfmt" value="true" />
+    <option name="version" value="2" />
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="b1bbc1f3-45f2-45ea-9240-b06206e1081f" name="Changes" comment="" />
+      <created>1631737289269</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1631737289269</updated>
+      <workItem from="1631737290540" duration="3229000" />
+      <workItem from="1631742940193" duration="5694000" />
+      <workItem from="1631796213303" duration="5096000" />
+      <workItem from="1631881559868" duration="15417000" />
+      <workItem from="1632240496028" duration="8491000" />
+      <workItem from="1632324778135" duration="18164000" />
+      <workItem from="1632396259241" duration="14184000" />
+      <workItem from="1633267193378" duration="18933000" />
+      <workItem from="1633288000676" duration="13159000" />
+      <workItem from="1633403834772" duration="12289000" />
+      <workItem from="1633420494958" duration="3432000" />
+      <workItem from="1633582145235" duration="40182000" />
+      <workItem from="1633684445499" duration="3852000" />
+      <workItem from="1633708450283" duration="19518000" />
+      <workItem from="1633747895909" duration="2000" />
+      <workItem from="1633748024962" duration="4080000" />
+      <workItem from="1633752112357" duration="4366000" />
+      <workItem from="1633788643512" duration="7596000" />
+      <workItem from="1633853008679" duration="1103000" />
+      <workItem from="1633860278451" duration="15135000" />
+      <workItem from="1633875644469" duration="152000" />
+    </task>
+    <task id="LOCAL-00001" summary="#1 - Initial commit">
+      <created>1633300120790</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1633300120790</updated>
+    </task>
+    <task id="LOCAL-00002" summary="#2 - Add API for Subject, ApiError struct">
+      <created>1633624280325</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1633624280325</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+    <option name="oldMeFiltersMigrated" value="true" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
+    <ignored-roots>
+      <path value="$PROJECT_DIR$/frontend/ediary_app" />
+    </ignored-roots>
+    <MESSAGE value="#1 - Initial commit" />
+    <MESSAGE value="#2 - Add API for Subject, ApiError struct" />
+    <option name="LAST_COMMIT_MESSAGE" value="#2 - Add API for Subject, ApiError struct" />
+  </component>
+  <component name="XSLT-Support.FileAssociations.UIState">
+    <expand />
+    <select />
+  </component>
+</project>

@@ -3,6 +3,6 @@ create table stage (
     id serial primary key,
     start_date date not null,
     end_date date not null,
-    student_id integer references student (id),
+    student_id integer references student (id) not null ,
     _stage varchar(32) not null
 )

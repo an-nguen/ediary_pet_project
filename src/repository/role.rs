@@ -3,21 +3,30 @@ use diesel::{BelongingToDsl, ExpressionMethods, PgConnection, QueryDsl, RunQuery
 use crate::models::role::Role;
 use crate::models::user::User;
 use crate::models::user_role::UserRole;
+use crate::repository::common::{PgConn, PgPool};
 
-pub fn get_roles_by_username(connection: &PgConnection, _username: &str) -> Vec<Role> {
-    use crate::schema::role;
-    use crate::schema::user_role::dsl::*;
-    use crate::schema::usr;
-    use crate::schema::usr::dsl::*;
-    use diesel::expression::dsl::any;
+#[derive(Clone)]
+pub struct RoleRepository(pub PgPool);
 
-    let user = usr::table
-        .filter(username.eq(_username))
-        .first::<User>(connection)
-        .unwrap();
-    let user_role_ids = UserRole::belonging_to(&user).select(role_id);
-    role::table
-        .filter(role::id.eq(any(user_role_ids)))
-        .load::<Role>(connection)
-        .unwrap()
+impl RoleRepository {
+    fn get_conn(&self) -> PgConn {
+        self.0.get().unwrap()
+    }
+    pub fn get_roles_by_user_id(&self, _id: i32) -> Vec<Role> {
+        use crate::schema::role;
+        use crate::schema::user_role::dsl::*;
+        use crate::schema::usr;
+        use diesel::expression::dsl::any;
+        let conn = self.get_conn();
+
+        let user = usr::table
+            .filter(usr::id.eq(_id))
+            .first::<User>(&conn)
+            .unwrap();
+        let user_role_ids = UserRole::belonging_to(&user).select(role_id);
+        role::table
+            .filter(role::id.eq(any(user_role_ids)))
+            .load::<Role>(&conn)
+            .unwrap_or(Vec::new())
+    }
 }

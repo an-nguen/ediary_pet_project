@@ -1,4 +1,16 @@
 table! {
+    acl (id) {
+        id -> Int4,
+        resource_path -> Varchar,
+        group_id_owner -> Int4,
+        group_read_access -> Bool,
+        group_write_access -> Bool,
+        all_read_access -> Bool,
+        all_write_access -> Bool,
+    }
+}
+
+table! {
     mark (id) {
         id -> Int4,
         student_id -> Int4,
@@ -24,7 +36,7 @@ table! {
         id -> Int4,
         start_date -> Date,
         end_date -> Date,
-        student_id -> Nullable<Int4>,
+        student_id -> Int4,
         _stage -> Varchar,
     }
 }
@@ -59,7 +71,6 @@ table! {
         id -> Int4,
         username -> Varchar,
         password_hash -> Varchar,
-        password_salt -> Varchar,
         email -> Varchar,
         birthday -> Date,
         active -> Bool,
@@ -72,6 +83,7 @@ joinable!(user_role -> role (role_id));
 joinable!(user_role -> usr (user_id));
 
 allow_tables_to_appear_in_same_query!(
+    acl,
     mark,
     role,
     stage,
