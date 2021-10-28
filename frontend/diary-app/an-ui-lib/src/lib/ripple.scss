@@ -1,0 +1,28 @@
+/* Ripple effect */
+@mixin ripple($color-on-hover, $color-on-active) {
+    .ripple {
+        background-position: center;
+        transition: background 0.8s;
+    }
+    .ripple:hover {
+        background: $color-on-hover radial-gradient(circle, transparent 1%, $color-on-hover 1%) center/15000%;
+    }
+    .ripple:active {
+        background-color: $color-on-active;
+        background-size: 100%;
+        transition: background 0s;
+    }
+}
+
+@mixin add-ripple($color-on-hover, $color-on-active) {
+    background-position: center;
+    transition: background 0.8s;
+    &:hover {
+        background: $color-on-hover radial-gradient(circle, transparent 1%, $color-on-hover 1%) center/15000%;
+    }
+    &:active {
+        background-color: $color-on-active;
+        background-size: 100%;
+        transition: background 0s;
+    }
+}
